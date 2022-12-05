@@ -1,3 +1,8 @@
+# This is a fork! Please visit the original WLED project here:✨
+[WLED](https://github.com/Aircoookie/WLED/)
+
+
+
 <p align="center">
   <img src="/images/wled_logo_akemi.png">
   <a href="https://github.com/Aircoookie/WLED/releases"><img src="https://img.shields.io/github/release/Aircoookie/WLED.svg?style=flat-square"></a>
