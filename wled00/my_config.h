@@ -21,5 +21,7 @@
 #define CLIENT_SSID "Your_SSID"
 #define CLIENT_PASS "Your_Password"
 */
+#define CLIENT_SSID "Dispatch"
+#define CLIENT_PASS "tower00loft"
 
 //#define MAX_LEDS 1500       //Maximum total LEDs. More than 1500 might create a low memory situation on ESP8266.
