@@ -27,9 +27,9 @@ class UsermodTemperature : public Usermod {
     int8_t temperaturePin = TEMPERATURE_PIN;
     // measurement unit (true==°C, false==°F)
     #ifndef USERMOD_DALLASTEMPERATURE_CELSIUS
-      bool degC = true;
-      #else
       bool degC = false;
+      #else
+      bool degC = true;
     #endif
     // using parasite power on the sensor
     bool parasite = false;
