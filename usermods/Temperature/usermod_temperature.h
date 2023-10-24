@@ -26,11 +26,7 @@ class UsermodTemperature : public Usermod {
     // GPIO pin used for sensor (with a default compile-time fallback)
     int8_t temperaturePin = TEMPERATURE_PIN;
     // measurement unit (true==°C, false==°F)
-    #ifndef USERMOD_DALLASTEMPERATURE_CELSIUS
-      bool degC = false;
-      #else
-      bool degC = true;
-    #endif
+    bool degC = true;
     // using parasite power on the sensor
     bool parasite = false;
     int8_t parasitePin = -1;
