@@ -17,6 +17,7 @@ private:
   bool umSSDRDisplayTime = false;
   bool umSSDRInverted = false;
   bool umSSDRColonblink = true;
+  bool umSSDRLeadingZero = false;
   bool umSSDREnableLDR = false;
   String umSSDRHours = "";
   String umSSDRMinutes = "";
@@ -79,6 +80,7 @@ private:
   static const char _str_timeEnabled[];
   static const char _str_inverted[];
   static const char _str_colonblink[];
+  static const char _str_leadingZero[];
   static const char _str_displayMask[];
   static const char _str_hours[];
   static const char _str_minutes[];
@@ -105,15 +107,15 @@ private:
       switch (umSSDRDisplayMask[index]) {
         case 'h':
           timeVar = hourFormat12(localTime);
-          _showElements(&umSSDRHours, timeVar, 0, 1);
+          _showElements(&umSSDRHours, timeVar, 0, !umSSDRLeadingZero);
           break;
         case 'H':
           timeVar = hour(localTime);
-          _showElements(&umSSDRHours, timeVar, 0, 1);
+          _showElements(&umSSDRHours, timeVar, 0, !umSSDRLeadingZero);
           break;
         case 'k':
           timeVar = hour(localTime) + 1;
-          _showElements(&umSSDRHours, timeVar, 0, 0);
+          _showElements(&umSSDRHours, timeVar, 0, !umSSDRLeadingZero);
           break;
         case 'm':
           timeVar = minute(localTime);
@@ -163,7 +165,7 @@ private:
   void _showElements(String *map, int timevar, bool isColon, bool removeZero
 
 ) {
-    if (!(*map).equals("") && !(*map) == NULL) {
+    if ((map != nullptr) && (*map != nullptr) && !(*map).equals("")) {
       int length = String(timevar).length();
       bool addZero = false;
       if (length == 1) {
@@ -234,11 +236,13 @@ private:
   }
 
   void _setLeds(int lednr, int lastSeenLedNr, bool range, int countSegments, int number, bool colon) {
+    if ((lednr < 0) || (lednr >= umSSDRLength)) return;                                   // prevent array bounds violation
 
+    if (!(colon && umSSDRColonblink) && ((number < 0) || (countSegments < 0))) return;
     if ((colon && umSSDRColonblink) || umSSDRNumbers[number][countSegments]) {
       
       if (range) {
-        for(int i = lastSeenLedNr; i <= lednr; i++) {
+        for(int i = max(0, lastSeenLedNr); i <= lednr; i++) {
           umSSDRMask[i] = true;
         }
       } else {
@@ -309,6 +313,9 @@ private:
     if (_cmpIntSetting_P(topic, payload, _str_colonblink, &umSSDRColonblink)) {
       return true;
     }
+    if (_cmpIntSetting_P(topic, payload, _str_leadingZero, &umSSDRLeadingZero)) {
+      return true;
+    }
     if (strcmp_P(topic, _str_displayMask) == 0) {
       umSSDRDisplayMask = String(payload);
       _publishMQTTstr_P(_str_displayMask, umSSDRDisplayMask);
@@ -323,6 +330,7 @@ private:
     _publishMQTTint_P(_str_ldrEnabled, umSSDREnableLDR);
     _publishMQTTint_P(_str_inverted, umSSDRInverted);
     _publishMQTTint_P(_str_colonblink, umSSDRColonblink);
+    _publishMQTTint_P(_str_leadingZero, umSSDRLeadingZero);
 
     _publishMQTTstr_P(_str_hours, umSSDRHours);
     _publishMQTTstr_P(_str_minutes, umSSDRMinutes);
@@ -347,6 +355,7 @@ private:
     ssdrObj[FPSTR(_str_ldrEnabled)] = umSSDREnableLDR;
     ssdrObj[FPSTR(_str_inverted)] = umSSDRInverted;
     ssdrObj[FPSTR(_str_colonblink)] = umSSDRColonblink;
+    ssdrObj[FPSTR(_str_leadingZero)] = umSSDRLeadingZero;
     ssdrObj[FPSTR(_str_displayMask)] = umSSDRDisplayMask;
     ssdrObj[FPSTR(_str_hours)] = umSSDRHours;
     ssdrObj[FPSTR(_str_minutes)] = umSSDRMinutes;
@@ -376,7 +385,7 @@ public:
     _setAllFalse();
 
     #ifdef USERMOD_SN_PHOTORESISTOR
-      ptr = (Usermod_SN_Photoresistor*) usermods.lookup(USERMOD_ID_SN_PHOTORESISTOR);
+      ptr = (Usermod_SN_Photoresistor*) UsermodManager::lookup(USERMOD_ID_SN_PHOTORESISTOR);
     #endif
     DEBUG_PRINTLN(F("Setup done"));
   }
@@ -425,6 +434,8 @@ public:
     invert.add(umSSDRInverted);
     JsonArray blink = user.createNestedArray("Blinking colon");
     blink.add(umSSDRColonblink);
+    JsonArray zero = user.createNestedArray("Show the hour leading zero");
+    zero.add(umSSDRLeadingZero);
     JsonArray ldrEnable = user.createNestedArray("Auto Brightness enabled");
     ldrEnable.add(umSSDREnableLDR);
 
@@ -454,6 +465,7 @@ public:
       umSSDREnableLDR = ssdrObj[FPSTR(_str_ldrEnabled)] | umSSDREnableLDR;
       umSSDRInverted = ssdrObj[FPSTR(_str_inverted)] | umSSDRInverted;
       umSSDRColonblink = ssdrObj[FPSTR(_str_colonblink)] | umSSDRColonblink;
+      umSSDRLeadingZero = ssdrObj[FPSTR(_str_leadingZero)] | umSSDRLeadingZero;
       umSSDRDisplayMask = ssdrObj[FPSTR(_str_displayMask)] | umSSDRDisplayMask;
     }
   }
@@ -470,14 +482,14 @@ public:
 
     if (mqttGroupTopic[0] != 0)
     {
-      //subcribe for sevenseg messages on the group topic
+      //subscribe for sevenseg messages on the group topic
       sprintf_P(subBuffer, PSTR("%s/%S/+/set"), mqttGroupTopic, _str_name);
       mqtt->subscribe(subBuffer, 2);
     }
   }
 
   bool onMqttMessage(char *topic, char *payload) {
-    //If topic beings iwth sevenSeg cut it off, otherwise not our message.
+    //If topic begins with sevenSeg cut it off, otherwise not our message.
     size_t topicPrefixLen = strlen_P(PSTR("/wledSS/"));
     if (strncmp_P(topic, PSTR("/wledSS/"), topicPrefixLen) == 0) {
       topic += topicPrefixLen;
@@ -516,6 +528,7 @@ public:
     umSSDREnableLDR        = (top[FPSTR(_str_ldrEnabled)] | umSSDREnableLDR);
     umSSDRInverted         = (top[FPSTR(_str_inverted)] | umSSDRInverted);
     umSSDRColonblink       = (top[FPSTR(_str_colonblink)] | umSSDRColonblink);
+    umSSDRLeadingZero      = (top[FPSTR(_str_leadingZero)] | umSSDRLeadingZero);
 
     umSSDRDisplayMask      = top[FPSTR(_str_displayMask)] | umSSDRDisplayMask;
     umSSDRHours            = top[FPSTR(_str_hours)] | umSSDRHours;
@@ -546,6 +559,7 @@ const char UsermodSSDR::_str_name[]        PROGMEM = "UsermodSSDR";
 const char UsermodSSDR::_str_timeEnabled[] PROGMEM = "enabled";
 const char UsermodSSDR::_str_inverted[]    PROGMEM = "inverted";
 const char UsermodSSDR::_str_colonblink[]  PROGMEM = "Colon-blinking";
+const char UsermodSSDR::_str_leadingZero[] PROGMEM = "Leading-Zero";
 const char UsermodSSDR::_str_displayMask[] PROGMEM = "Display-Mask";
 const char UsermodSSDR::_str_hours[]       PROGMEM = "LED-Numbers-Hours";
 const char UsermodSSDR::_str_minutes[]     PROGMEM = "LED-Numbers-Minutes";

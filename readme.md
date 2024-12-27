@@ -3,7 +3,7 @@
   <a href="https://github.com/Aircoookie/WLED/releases"><img src="https://img.shields.io/github/release/Aircoookie/WLED.svg?style=flat-square"></a>
   <a href="https://raw.githubusercontent.com/Aircoookie/WLED/master/LICENSE"><img src="https://img.shields.io/github/license/Aircoookie/wled?color=blue&style=flat-square"></a>
   <a href="https://wled.discourse.group"><img src="https://img.shields.io/discourse/topics?colorB=blue&label=forum&server=https%3A%2F%2Fwled.discourse.group%2F&style=flat-square"></a>
-  <a href="https://discord.gg/A2FpqFQaRS"><img src="https://img.shields.io/discord/473448917040758787.svg?colorB=blue&label=discord&style=flat-square"></a>
+  <a href="https://discord.gg/QAh7wJHrRM"><img src="https://img.shields.io/discord/473448917040758787.svg?colorB=blue&label=discord&style=flat-square"></a>
   <a href="https://kno.wled.ge"><img src="https://img.shields.io/badge/quick_start-wiki-blue.svg?style=flat-square"></a>
   <a href="https://github.com/Aircoookie/WLED-App"><img src="https://img.shields.io/badge/app-wled-blue.svg?style=flat-square"></a>
   <a href="https://gitpod.io/#https://github.com/Aircoookie/WLED"><img src="https://img.shields.io/badge/Gitpod-ready--to--code-blue?style=flat-square&logo=gitpod"></a>
@@ -26,7 +26,7 @@ A fast and feature-rich implementation of an ESP8266/ESP32 webserver to control 
 - Up to 250 user presets to save and load colors/effects easily, supports cycling through them.  
 - Presets can be used to automatically execute API calls  
 - Nightlight function (gradually dims down)  
-- Full OTA software updatability (HTTP + ArduinoOTA), password protectable  
+- Full OTA software updateability (HTTP + ArduinoOTA), password protectable  
 - Configurable analog clock (Cronixie, 7-segment and EleksTube IPS clock support via usermods) 
 - Configurable Auto Brightness limit for safe operation  
 - Filesystem-based config for easier backup of presets and settings  
@@ -61,12 +61,12 @@ See [here](https://kno.wled.ge/basics/compatible-hardware)!
 
 ## ✌️ Other
 
-Licensed under the MIT license  
+Licensed under the EUPL v1.2 license  
 Credits [here](https://kno.wled.ge/about/contributors/)!
 
 Join the Discord server to discuss everything about WLED!
 
-<a href="https://discord.gg/A2FpqFQaRS"><img src="https://discordapp.com/api/guilds/473448917040758787/widget.png?style=banner2" width="25%"></a>
+<a href="https://discord.gg/QAh7wJHrRM"><img src="https://discordapp.com/api/guilds/473448917040758787/widget.png?style=banner2" width="25%"></a>
 
 Check out the WLED [Discourse forum](https://wled.discourse.group)!  
 
@@ -80,5 +80,5 @@ If WLED really brightens up your day, you can [![](https://img.shields.io/badge/
 If you are prone to photosensitive epilepsy, we recommended you do **not** use this software.  
 If you still want to try, don't use strobe, lighting or noise modes or high effect speed settings.
 
-As per the MIT license, I assume no liability for any damage to you or any other person or equipment.  
+As per the EUPL license, I assume no liability for any damage to you or any other person or equipment.  
 
